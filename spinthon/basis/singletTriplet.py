@@ -2,7 +2,7 @@ import itertools
 import numpy as np
 #import copy
 
-from zeeman import zeemanProductBasis
+from .zeeman import zeemanProductBasis
 
 class singletTripletBasis(zeemanProductBasis):
     def __init__(self, spinSystem):
@@ -22,14 +22,18 @@ class singletTripletBasis(zeemanProductBasis):
 
         dim = spinSystem.dimension
 
-        for k in range(dim/4, 2*dim/4):
-            bFix = self.basis[k]
-            self.basis[k] = 1/np.sqrt(2)*(self.basis[k + dim/4] + self.basis[k])
-            self.basis[k + dim/4] = 1/np.sqrt(2)*(self.basis[k+dim/4] - bFix)
+        start = int(dim/4)
+        stop = int(2*dim/4)
+        
+        for k in range(start, stop):
+            bFix = self.Kets[k]
+            self.Kets[k] = 1/np.sqrt(2)*(self.Kets[k + start] + self.Kets[k])
+            self.Kets[k + start] = 1/np.sqrt(2)*(self.Kets[k+start] - bFix)
 
         #now lets rearange:
 
-        self.basis = self.basis[2*dim/4:3*dim/4] + self.basis[0:2*dim/4] + self.basis[3*dim/4:]
-            
-        for b in self.basis:
-            print b
+        self.Kets = self.Kets[2*start:3*start] + self.Kets[0:2*start] + self.Kets[3*start:]
+        self.Bras = [k.getBra() for k in self.Kets]
+        
+        for b in self.Bras:
+            print(b)

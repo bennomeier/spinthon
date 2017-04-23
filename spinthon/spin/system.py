@@ -1,19 +1,22 @@
+import itertools
+
 import numpy as np
-import single.data
-import single.operators
+import spinthon.spin.single.data
+import spinthon.spin.single.operators
 
 from ..basis import zeeman
+from ..basis.vector import ElementaryKet, ElementaryBra
 
 
 class Spin(object):
     """represent a single spin"""
     def __init__(self, name):
-        self.gamma = single.data.gammaListAll[name]
-        self.spin = single.data.spinListAll[name]
+        self.gamma = spinthon.spin.single.data.gammaListAll[name]
+        self.spin = spinthon.spin.single.data.spinListAll[name]
 
         """this returns the matrix representation of a single spin 
         in a single spin hilbert state with elementary basis kets."""
-        self.spinOps = single.operators.getSpinOperators(self.spin)
+        self.spinOps = spinthon.spin.single.operators.getSpinOperators(self.spin)
 
     def __getattr__(self, attr):
         #allow retrieval of e.g. Ix by calling spin.Ix
@@ -34,9 +37,16 @@ class spinSystem(object):
 
             self.dimension = int(self.dimension*(2*S.spin+1))
 
+        maxVal = tuple([s.spin for s in self.spinSystem])
+        ranges = [np.arange(-s.spin, s.spin + 1) for s in self.spinSystem]
+
+        elementaryStatesList = list(itertools.product(*ranges))
+            
+        self.ekets = [ElementaryKet(l, maxVal) for l in elementaryStatesList]
+        self.ebras = [ElementaryBra(l, maxVal) for l in elementaryStatesList]
+            
         if basis == "zeeman":
             self.basis = zeeman.zeemanProductBasis(self)
-
             
         if verbose:
             print("Spin System initialized.")

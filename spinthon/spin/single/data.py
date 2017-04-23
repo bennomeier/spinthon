@@ -1,3 +1,7 @@
+"""data.py contains values for the gyromagnetic ratio gamma of all the nuclei and the electron.
+It also contains the spin of selected nuclei."""
+
+
 #print "This is gammList"
 gammaListAll = {}
 gammaListAll["E"] = 1.7608597e11  
@@ -131,6 +135,8 @@ gammaListAll["235U"] = -0.52e7#Uranium
 
 spinListAll = {}
 spinListAll["1H"] = 1./2
+spinListAll["2H"] = 1
+spinListAll["11B"] = 3./2
 spinListAll["13C"] = 1./2
 spinListAll["17O"] = 5./2
 
@@ -149,4 +155,4 @@ def gammaList(nucleus):
     return get(nucleus)
 
 if __name__ == "__main__":
-    print gamma.__doc__
+    print(gamma.__doc__)

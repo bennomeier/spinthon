@@ -7,7 +7,7 @@ def getSpinOperators(I, retOnly=""):
     for any integer or half inter spin I"""
 
     ops = {}
-    dim = 2*I + 1
+    dim = int(2*I + 1)
     zComponent = np.arange(I, -I-1, -1)
     Iz = np.diag(zComponent)
 
@@ -49,10 +49,10 @@ def getRotationOperatorList(list):
 
 
 if __name__ == "__main__":
-    print "spinOperators Test"
+    print("spinOperators Test")
     ops = getSpinOperators(1.5)
 
     for i in ops:
-        print ""
-        print i
-        print ops[i]
+        print()
+        print(i)
+        print(ops[i])

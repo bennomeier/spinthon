@@ -1,37 +1,45 @@
-import itertools
+#this is required for python > 3.4
+from importlib import reload
+
 import numpy as np
 
-import vector
-reload(vector)
-
-from vector import BasisKet, Ket
-
+from spinthon.basis.vector import Ket, Bra
 
 
 class zeemanProductBasis(object):
     def __init__(self, spinSystem):
-        maxVal = tuple([s.spin for s in spinSystem])
-        ranges = [np.arange(-s.spin, s.spin + 1) for s in spinSystem]
+        """Elementary zeeman product basis.
+
+        Parent class to all other bases.
         
+        Any basis has fields
+        
+        b.Kets
+        b.Bras
+
+        These are linear combinations of the elementary kets / bras of the spin system.
+
+        The __getitem__ method will return the Ket.
+        """
         self.name = "Zeeman Product Basis"
-        self.basisketsList = list(itertools.product(*ranges))
-        
-        self.basiskets = [BasisKet(l, maxVal) for l in self.basisketsList]
 
-        #for the zeeman basis the coefficients are just one in one position and zeros elsewhere
+        S = spinSystem
 
-        self.basis = []
+        # for the zeeman basis the coefficients are just one in one position,
+        # and zeros elsewhere        
+        self.Kets = []
 
-        for k in range(spinSystem.dimension):
-            coefficients = np.zeros(spinSystem.dimension)
+
+        for k in range(S.dimension):
+            coefficients = np.zeros(S.dimension)
             coefficients[k] = 1
 
-            #note that it maybe slightly redundant to store the basiskets.
-            self.basis.append(Ket(coefficients, self.basiskets))
+            #note that it is redundant to store the kets
+            self.Kets.append(Ket(coefficients, S.ekets))
 
-        
+        self.Bras = [k.getBra() for k in self.Kets]
         
     def __getitem__(self, pos):
         """support indexing of the basis"""
-        return self.basis[pos]
+        return self.Kets[pos]
         
