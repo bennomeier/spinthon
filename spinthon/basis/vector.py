@@ -12,10 +12,15 @@ class ElementaryKet(object):
 
     This class also supplies methods to apply a basic spin operator to the i-th spin."""
     
-    def __init__(self, value, maxVal):
+    def __init__(self, value, maxVal, repr = "plusMinus"):
         self.maxVal = maxVal
         self.value = value
-
+        self.repr = repr
+        if self.repr == "plusMinus":
+            self.reprDict = {0.5: "+", -0.5: "-"}
+        elif self.repr == "alphaBeta":
+            self.reprDict = {0.5: "α", -0.5: "β"}
+        
     def __eq__(self, other):
         return self.value == other.value
 
@@ -61,10 +66,13 @@ class ElementaryKet(object):
 
     def __repr__(self):
         ketString = "|"
-        for t in self.value:
-            if len(ketString) > 1:
-                ketString += ","
-            ketString += str(t)
+        for i, t in enumerate(self.value):
+            if self.repr != "numeric":
+                ketString += self.reprDict[t]
+            else:
+                if len(ketString) > 1:
+                    ketString += ","
+                ketString += str(t)
         ketString += ">"
 
         return ketString
@@ -75,30 +83,34 @@ class ElementaryBra(object):
    
     Multiplication with an elementary ket (inner product) yields 0 or 1.
     """
-    def __init__(self, value, maxVal):
+    def __init__(self, value, maxVal, repr = "alphaBeta"):
         self.maxVal = maxVal
-        self.value =  value
+        self.value = value
+        self.repr = repr
+        self.alphaBetaDict = {0.5: "+", -0.5: "-"}
 
     def __mul__(self, other):
         """Multiplication with a Ket from the right is the inner product."""
-        assert(isinstance(other, ElementaryKet))        
+        assert(isinstance(other, ElementaryKet))
         retValue = 0
         if other.value == self.value:
             retValue = 1
         return retValue
-            
-        
+
     def __repr__(self):
         ketString = "<"
-        for t in self.value:
-            if len(ketString) > 1:
-                ketString += ","
-            ketString += str(t)
+        for i, t in enumerate(self.value):
+            if self.repr == "alphaBeta":
+                ketString += self.alphaBetaDict[t]
+            else:
+                if len(ketString) > 1:
+                    ketString += ","
+                ketString += str(t)
         ketString += "|"
 
-        return ketString        
-        
+        return ketString
 
+    
 class Ket(object):
     def __init__(self, coeffs, ekets):
         """A Ket is simply a linear combination of elementary kets of the spinsystem.

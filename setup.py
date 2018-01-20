@@ -11,5 +11,6 @@ setup(name='spinthon',
       install_requires = [
           'numpy',
           'scipy',
+          'spindata'
           ],
       zip_safe=False)

@@ -1,8 +1,9 @@
 import itertools
 
 import numpy as np
-import spinthon.spin.single.data
+import spindata
 import spinthon.spin.single.operators
+import spinthon.spin.geometry
 
 from ..basis import zeeman
 from ..basis.vector import ElementaryKet, ElementaryBra
@@ -11,8 +12,8 @@ from ..basis.vector import ElementaryKet, ElementaryBra
 class Spin(object):
     """represent a single spin"""
     def __init__(self, name):
-        self.gamma = spinthon.spin.single.data.gammaListAll[name]
-        self.spin = spinthon.spin.single.data.spinListAll[name]
+        self.gamma = spindata.gamma(name)
+        self.spin = spindata.spin(name)
 
         """this returns the matrix representation of a single spin 
         in a single spin hilbert state with elementary basis kets."""
@@ -24,12 +25,14 @@ class Spin(object):
 
 
 class spinSystem(object):
-    def __init__(self, spins, verbose = False, basis = "zeeman"):
+    def __init__(self, spins, verbose = False, basis = "zeeman", geometry = None):
         """Spins: A list of spins, e.g. ["1H", "1H", "1H", "13C"]"""
 
         self.spinSystem = []
 
         self.dimension = 1
+
+        self.geometry = geometry
         
         for s in spins:
             S = Spin(s)
@@ -40,7 +43,9 @@ class spinSystem(object):
         maxVal = tuple([s.spin for s in self.spinSystem])
         ranges = [np.arange(-s.spin, s.spin + 1) for s in self.spinSystem]
 
-        elementaryStatesList = list(itertools.product(*ranges))
+        #note that we use reverse here so that the matrix representation of singlet
+        #spin operators corresponds to the literature.
+        elementaryStatesList = reversed(list(itertools.product(*ranges)))
             
         self.ekets = [ElementaryKet(l, maxVal) for l in elementaryStatesList]
         self.ebras = [ElementaryBra(l, maxVal) for l in elementaryStatesList]
@@ -52,11 +57,20 @@ class spinSystem(object):
             print("Spin System initialized.")
             print("Dimensionality: {}".format(self.dimension))
 
-            
+    
         
     def __getitem__(self, pos):
         """support indexing of the spin system"""
         return self.spinSystem[pos]
+
+    def __len__(self):
+        return len(self.spinSystem)
+    
+    def addGeometry(self, predefined = ""):
+        self.geometry = spinthon.spin.geometry.Geometry(self, predefined)
+
+        assert(len(self.geometry) == len(self))
+
 
 
         
