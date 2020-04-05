@@ -1,6 +1,8 @@
 import itertools
 
 import numpy as np
+from scipy.linalg import expm
+
 import spindata
 import spinthon.spin.single.operators
 import spinthon.spin.geometry
@@ -19,6 +21,13 @@ class Spin(object):
         in a single spin hilbert state with elementary basis kets."""
         self.spinOps = spinthon.spin.single.operators.getSpinOperators(self.spin)
 
+    def rotationOp(self, beta, phi):
+        """This returns the single spin  matrix representation of the rotation operator
+        - beta: flip angle
+        - phi: phase
+        """
+        return expm(-1j*beta*(self.spinOps["Ix"]*np.cos(phi) + self.spinOps["Iy"]*np.sin(phi)))
+ 
     def __getattr__(self, attr):
         #allow retrieval of e.g. Ix by calling spin.Ix
         return self.spinOps[attr]
@@ -33,6 +42,8 @@ class spinSystem(object):
         self.dimension = 1
 
         self.geometry = geometry
+
+        self.tol = 1e-15
         
         for s in spins:
             S = Spin(s)

@@ -31,6 +31,13 @@ def getSpinOperators(I, retOnly=""):
     return retVal
         
 
+def getSingleSpinRotationOperator(I, phi, beta):
+    spinOps = getSpinOperators(I)
+    Ix = spinOps["Ix"]
+    Iy = spinOps["Iy"]
+    return expm(-1j*beta*(Ix*np.cos(phi) + Iy*np.sin(phi)))
+
+
 def getRotationOperator(matrix):
     return expm(-1j*matrix)
 
