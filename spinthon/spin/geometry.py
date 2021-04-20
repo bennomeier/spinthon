@@ -34,7 +34,20 @@ class Geometry(object):
             pos2 = np.array([np.sin(thetaHOH/2), 0, np.cos(thetaHOH/2)])*bondLength
 
             self.positions = [pos1, pos2]
+            
+    def setMiniDNPGeometry(self, e_e_distance = 1e-9, theta = np.pi/4, e_n1_distance = 0.2e-9, theta2 = np.pi/5, phi = np.pi):
+            self.name = "miniDNP1"
+            
+            r1 = e_e_distance
+            r2 = e_n1_distance
+            
+            theta = np.pi/4
+            
+            pos1 = np.array([0,0,0])
+            pos2 = np.array([r1*np.sin(theta), 0, r1*np.cos(theta)])
+            pos3 = np.array([r2*np.sin(theta)*np.cos(phi), r2*np.sin(theta)*np.sin(phi), r2*np.cos(theta)])
 
+            self.positions = [pos1, pos2, pos3]
             
     def __getitem__(self, pos):
         return self.positions[pos]

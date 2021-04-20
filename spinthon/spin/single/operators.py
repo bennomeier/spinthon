@@ -4,7 +4,7 @@ from scipy.linalg import expm
 
 def getSpinOperators(I, retOnly=""):
     """getSpinOperators(I) returns a dictionary containing entries Ix, Iy, Iz, Ip, Im
-    for any integer or half inter spin I"""
+    for any integer or half integer spin I"""
 
     ops = {}
     dim = int(2*I + 1)
@@ -41,8 +41,8 @@ def getSingleSpinRotationOperator(I, phi, beta):
 def getRotationOperator(matrix):
     return expm(-1j*matrix)
 
-def getRotationOperatorList(list):
-    return [expm(-1j*element) for element in list]
+def getRotationOperatorList(arglist):
+    return [expm(-1j*element) for element in arglist]
 
 #def getEqDensityMatrix(I,T,nu):
 #    if I != 0.5:
