@@ -1,6 +1,8 @@
 from scipy.constants import mu_0, hbar
+import spindata
+import numpy as np
 
-# hyperfine Eq. 3.19 in Wenckebach
+# hyperfine Eq. 3.19 in Wenckebach, truncated
 def A(index, nuc, r, theta, phi=0):
     gS = spindata.gamma("E")
     gI = spindata.gamma(nuc)

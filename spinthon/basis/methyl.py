@@ -1,12 +1,12 @@
 import numpy as np
 
-from spinthon.basis.zeeman import zeemanProductBasis
-from spinthon.spin.system import spinSystem
+from spinthon.basis.zeeman import ZeemanProductBasis
+from spinthon.spin.system import SpinSystem
 
 
-class methyl_A_E(zeemanProductBasis):
+class methyl_A_E(ZeemanProductBasis):
     def __init__(self, spinSystem):
-        zeemanProductBasis.__init__(self, spinSystem)
+        ZeemanProductBasis.__init__(self, spinSystem)
 
         # we have to refactor the first three spins
         # assume the singlet-triplet quantum numbers come first.
@@ -14,6 +14,7 @@ class methyl_A_E(zeemanProductBasis):
         # the first ones are b,b,b,x, followed by b,b,a,x, ..., a, a, a, x
 
         self.name = "Methyl A and E states basis"
+        self.spinSystem = spinSystem
         dim = spinSystem.dimension
 
         # this is the multiplicity of each of the a and e states.

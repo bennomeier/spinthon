@@ -4,11 +4,11 @@ suitable for singlet/triplet spin states."""
 import numpy as np
 
 
-from spinthon.basis.zeeman import zeemanProductBasis
-from spinthon.spin.system import spinSystem
+from spinthon.basis.zeeman import ZeemanProductBasis
+from spinthon.spin.system import SpinSystem
 
 
-class singletTripletBasis(zeemanProductBasis):
+class SingletTripletBasis(ZeemanProductBasis):
     """singletTripletBasis provides a new basis for a given spinSystem.
     Its init routine calls the parent class constructor, zeemanProductBasis.
     The singlet/triplet pair comprises the first two spins in the spin system.
@@ -22,7 +22,7 @@ class singletTripletBasis(zeemanProductBasis):
     , then follow the T_{0} states and ultimately the T_{-1} states.
     """
     def __init__(self, spinSystem):
-        zeemanProductBasis.__init__(self, spinSystem)
+        ZeemanProductBasis.__init__(self, spinSystem)
 
         # by definition the singlet-triplet quantum numbers come first.
         # hence part all the kets into four sets of the same length
@@ -33,6 +33,7 @@ class singletTripletBasis(zeemanProductBasis):
         # the fourth ones are -1/2, -1/2, x
 
         self.name = "Singlet Triplet Basis"
+        self.spinSystem = spinSystem
 
         # hence first and fourths onces are triplets,
         # second and third ones need to be mixed
@@ -58,8 +59,8 @@ class singletTripletBasis(zeemanProductBasis):
 
 if __name__ == "__main__":
     print("Singlet Triplet Basis Test")
-    S = spinSystem(["1H", "1H", "13C"])
-    spinSystem.basis = singletTripletBasis(S)
+    S = SpinSystem(["1H", "1H", "13C"])
+    spinSystem.basis = SingletTripletBasis(S)
     print("Basis: " + spinSystem.basis.name)
 
     for k in S.basis:

@@ -4,9 +4,9 @@
 import numpy as np
 
 from spinthon.basis.vector import Ket, Bra
+from spinthon.basis.basis import Basis
 
-
-class zeemanProductBasis(object):
+class ZeemanProductBasis(Basis):
     def __init__(self, spinSystem):
         """Elementary zeeman product basis.
 
@@ -21,6 +21,7 @@ class zeemanProductBasis(object):
 
         The __getitem__ method will return the Ket.
         """
+        self.spinSystem = spinSystem
         self.name = "Zeeman Product Basis"
 
         S = spinSystem
@@ -38,8 +39,4 @@ class zeemanProductBasis(object):
             self.Kets.append(Ket(coefficients, S.ekets))
 
         self.Bras = [k.getBra() for k in self.Kets]
-        
-    def __getitem__(self, pos):
-        """support indexing of the basis"""
-        return self.Kets[pos]
         

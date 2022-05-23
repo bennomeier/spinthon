@@ -35,3 +35,13 @@ def D(m,n,alpha,beta,gamma):
     """
     
     return d(m,n,beta)*np.exp(-1j*m*alpha - 1j*n*gamma)
+
+if __name__ == "__main__":
+    from euler import tensorTransform
+
+    tensor = np.diag([0.5, 1.3, 2.2])
+    print(tensorTransform(1, 1.3, 2, tensor))
+    
+    tensorPrime = np.zeros(np.shape(tensor))
+    
+    

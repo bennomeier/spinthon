@@ -19,11 +19,11 @@ SpinOperator
 This is a helper object which creates a SpinOperatorSum and populates it with a single spin operator.
 
 VectorSpinOperator
-This is a vector of spin operators, i.e. S = [Sx, Sy, Sz] with a definition for matrix multiplication.
+This is a vector of spinoperators, i.e. S = [Sx, Sy, Sz] with a definition for matrix multiplication.
 """
 from array import array
 import numpy as np
-from scipy.linalg import expm, eigh
+from scipy.linalg import expm
 
 from spinthon.basis.vector import Ket
 
@@ -259,7 +259,7 @@ class SpinOperatorSum(object):
         
     def __add__(self, other):
         #print("Other type: ", type(other))
-        assert isinstance(other, (SpinOperatorSum, SpinOperator))
+        assert isinstance(other, (SpinOperatorSum, SpinOperator)), ("In compatible type ", type(other))
         return SpinOperatorSum(self.products + other.products)
     
     def __sub__(self, other):
@@ -304,12 +304,16 @@ class SpinOperator(SpinOperatorSum):
         op = SpinOperatorSingle(spinSystem, position, which)
         self.products = [SpinOperatorProduct(1, [op])]
 
-
-class VectorSpinOperatorGeneral():
-    __array_priority__ = 100
-    def __init__(self, components):
-        self._components = components
         
+class VectorSpinOperator(object):
+    # note the line below is needed STRICTLY,
+    # otherwise numpy takes care of multiplication and causes a mess.
+    __array_priority__ = 100
+    def __init__(self, spinSystem, position):
+        self._components = [SpinOperator(spinSystem, position, "Ix"),
+                     SpinOperator(spinSystem, position, "Iy"),
+                     SpinOperator(spinSystem, position, "Iz")]
+
     def __iter__(self):
         return iter(self._components)
 
@@ -322,28 +326,41 @@ class VectorSpinOperatorGeneral():
     def __matmul__(self, other):
         #print("Matmul")
         #print("Self: ", self)
-        #print("Other: ", other)
-        #print("Type Other: ", type(other))
+        print("Other: ", other.__class__.__mro__)
+        #0print("Type Other: ", type(other).__name__)
         
-        if isinstance(other, np.ndarray):            
+        if isinstance(other, np.ndarray):
             # Note that here we just assume that other is a matrix."""
             # print("Shape: ", other.shape)
             if other.shape == (3,3):
+                # print("Other is 3x3 Matrix.")
                 c1 = other[:,0]@self._components
+                # print("c1: ", c1)
                 c2 = other[:,1]@self._components
                 c3 = other[:,2]@self._components
                 return VectorSpinOperatorGeneral([c1, c2, c3])
             elif other.shape ==(3,):
+                # print("Multiplying with array.")
                 return other[0]*self[0] + other[1]*self[1] + other[2]*self[2]
         
-        elif type(other).__name__ == "VectorSpinOperator" or type(other).__name__==  "VectorSpinOperatorGeneral":
+        # note that below we would normally use isinstance(), however 
+        # for some arcane reason isinstance(other, VectorSpinOperator) does not
+        # seem to evaluate correctly.
+        
+        elif type(other).__name__ == "VectorSpinOperator" or type(other).__name__ == "VectorSpinOperatorGeneral":
+            #print("Now we should return a simple spinOperator")
             res = self[0]*other[0] + self[1]*other[1] + self[2]*other[2]
+            # print(res)
             return res
         
         else:
             print("Something went wrong.")
             print("other: ", other)
-            print("type (other2): ", type(other))
+            print("self: ", self)
+            print(other.__class__.__mro__)
+            print("type (other2): ", type(other).__name__)
+            print(type(other) ==  "<class 'spinthon.spin.operators.VectorSpinOperator'>")
+            print("type (self): ", type(self))
             return NotImplemented
     
 
@@ -355,24 +372,20 @@ class VectorSpinOperatorGeneral():
     def __rmatmul__(self, other):
         """ Right Multiplication. Self appears on the right,
         other on the left. Self is a spin vector, other can be an np.array"""
-        #print("RMATMUL")
-        #print("Self: ", self)
-        #print("Other: ", other)
-        #print("Type Other: ", type(other))
-        
-        if isinstance(other, (float, int)):
-            print("Hello")
-            return 1  
         if isinstance(other, np.ndarray):
-            #print(other.shape)
             if other.shape == (3,3):
+                # print("Other is 3x3 Matrix.")
                 c1 = other[:,0]@self._components
+                # print("c1: ", c1)
                 c2 = other[:,1]@self._components
                 c3 = other[:,2]@self._components
                 return VectorSpinOperatorGeneral([c1, c2, c3])
                         
             elif other.shape ==(3,):
-                return other[0]*self[0] + other[1]*self[1] + other[2]*self[2]
+                # print("Multiplying with array.")
+                opR = other[0]*self[0] + other[1]*self[1] + other[2]*self[2]
+                return opR
+                
             
             else:
                 print("Rmatmul", other)
@@ -385,15 +398,10 @@ class VectorSpinOperatorGeneral():
                 return NotImplemented
 
     def __repr__(self):
-        return "[" + ", ".join([p.__repr__() for p in self._components]) + "]"        
-        
-class VectorSpinOperator(VectorSpinOperatorGeneral):
-    # note the line below is needed STRICTLY,
-    # otherwise numpy takes care of multiplication and causes a mess.
-    __array_priority__ = 100
-    def __init__(self, spinSystem, position):
-        self._components = [SpinOperator(spinSystem, position, "Ix"),
-                     SpinOperator(spinSystem, position, "Iy"),
-                     SpinOperator(spinSystem, position, "Iz")]
+        return "[" + ", ".join([p.__repr__() for p in self._components]) + "]"
 
+    
 
+class VectorSpinOperatorGeneral(VectorSpinOperator):
+    def __init__(self, components):
+        self._components = components

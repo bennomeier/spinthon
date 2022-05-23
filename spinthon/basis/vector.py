@@ -12,7 +12,7 @@ class ElementaryKet(object):
 
     This class also supplies methods to apply a basic spin operator to the i-th spin."""
     
-    def __init__(self, value, maxVal, repr = "plusMinus"):
+    def __init__(self, value, maxVal, repr = "numeric"):
         self.maxVal = maxVal
         self.value = value
         self.repr = repr
@@ -67,8 +67,8 @@ class ElementaryKet(object):
     def __repr__(self):
         ketString = "|"
         for i, t in enumerate(self.value):
-            if self.repr != "numeric":
-                ketString += self.reprDict[t]
+            if self.repr != "numeric" and self.maxVal == 0.5:
+                ketString += self.reprDict[i]
             else:
                 if len(ketString) > 1:
                     ketString += ","
@@ -98,17 +98,17 @@ class ElementaryBra(object):
         return retValue
 
     def __repr__(self):
-        ketString = "<"
+        braString = "<"
         for i, t in enumerate(self.value):
-            if self.repr == "alphaBeta":
-                ketString += self.alphaBetaDict[t]
+            if self.repr != "numeric" and self.maxVal == 0.5:
+                braString += self.reprDict[t]
             else:
-                if len(ketString) > 1:
-                    ketString += ","
-                ketString += str(t)
-        ketString += "|"
+                if len(braString) > 1:
+                    braString += ","
+                braString += str(t)
+        braString += "|"
 
-        return ketString
+        return braString
 
     
 class Ket(object):
@@ -135,8 +135,12 @@ class Ket(object):
         
         return Ket(self.coeffs - other.coeffs, self.ekets)
 
-    def __rmul__(self, factor):
-        return Ket(self.coeffs*factor, self.ekets)
+    def __rmul__(self, other):
+        if isinstance(other, (float, int)):
+            return Ket(self.coeffs*other, self.ekets)
+        else:
+            print("don't know what to do here.")
+
 
     
     def __repr__(self):
@@ -153,7 +157,7 @@ class Ket(object):
         return output
 
     def getBra(self):
-        return Bra(self.coeffs, [b.getBra() for b in self.ekets])
+        return Bra(np.conj(self.coeffs), [b.getBra() for b in self.ekets])
 
     def Iz(self, pos):
         return np.sum([self.coeffs[k]*self.ekets[k].Iz(pos) for k in range(len(self.ekets))])
@@ -196,7 +200,8 @@ class Bra():
 
         sum = 0
         for k in range(len(self.coeffs)):
-            sum += np.conj(self.coeffs[k])*other.coeffs[k]
+            # sum += np.conj(self.coeffs[k])*other.coeffs[k]
+            sum += self.coeffs[k]*other.coeffs[k]
         
         return sum
     

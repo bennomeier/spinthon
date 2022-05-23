@@ -9,3 +9,16 @@
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
+
+# Tempol and Trityl Examples and data files in the examples folder
+/examples/6p72*
+/examples/TEMPOL.ipynb
+/examples/Trityl.ipynb
+
+# anything in private
+/private/
+
+/.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+.DS_Store

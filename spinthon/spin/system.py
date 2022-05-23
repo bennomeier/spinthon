@@ -14,8 +14,13 @@ from ..basis.vector import ElementaryKet, ElementaryBra
 class Spin(object):
     """represent a single spin"""
     def __init__(self, name):
-        self.gamma = spindata.gamma(name)
-        self.spin = spindata.spin(name)
+        if ":" in name:
+            name, multiplicity = name.split(":")
+            self.gamma = spindata.gamma(name)
+            self.spin = float(multiplicity)
+        else:
+            self.gamma = spindata.gamma(name)                              
+            self.spin = spindata.spin(name)
 
         """this returns the matrix representation of a single spin 
         in a single spin hilbert state with elementary basis kets."""
@@ -33,7 +38,7 @@ class Spin(object):
         return self.spinOps[attr]
 
 
-class spinSystem(object):
+class SpinSystem(object):
     def __init__(self, spins, verbose = False, basis = "zeeman", geometry = None):
         """Spins: A list of spins, e.g. ["1H", "1H", "1H", "13C"]"""
 
@@ -62,7 +67,7 @@ class spinSystem(object):
         self.ebras = [ElementaryBra(l, maxVal) for l in elementaryStatesList]
             
         if basis == "zeeman":
-            self.basis = zeeman.zeemanProductBasis(self)
+            self.basis = zeeman.ZeemanProductBasis(self)
             
         if verbose:
             print("Spin System initialized.")
@@ -87,9 +92,9 @@ class spinSystem(object):
         
 if __name__ == "__main__":
 
-    methyl = spinSystem(["1H", "1H", "1H"])
+    methyl = SpinSystem(["1H", "1H", "1H"])
     
-    methyl13C = spinSystem(["1H", "1H", "1H", "13C"])
+    methyl13C = SpinSystem(["1H", "1H", "1H", "13C"])
 
-    h2o17 = spinSystem(["1H", "1H", "17O"])
+    h2o17 = SpinSystem(["1H", "1H", "17O"])
     
